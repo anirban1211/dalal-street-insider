@@ -1,0 +1,19 @@
+{
+  "name": "dsi-backend",
+  "version": "1.0.0",
+  "description": "Backend for Dalal Street Insider",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.11.4",
+    "axios": "^1.18.0",
+    "cheerio": "^1.2.0",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "node-cron": "^3.0.3",
+    "rss-parser": "^3.13.0"
+  }
+}
