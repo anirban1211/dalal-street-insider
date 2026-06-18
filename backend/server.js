@@ -225,6 +225,58 @@ app.get('/api/news', (req, res) => {
   }
 });
 
+app.get('/api/market-pulse', async (req, res) => {
+  const fetchTicker = async (symbol) => {
+    try {
+      const response = await axios.get(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)'
+        },
+        timeout: 5000
+      });
+      const result = response.data.chart.result[0].meta;
+      return {
+        price: result.regularMarketPrice,
+        prevClose: result.previousClose
+      };
+    } catch (err) {
+      console.error(`Failed to fetch market pulse for ${symbol}:`, err.message);
+      return null;
+    }
+  };
+
+  const tickers = {
+    nifty: '%5ENSEI',
+    sensex: '%5EBSESN',
+    gold: 'GC=F',
+    usdinr: 'USDINR=X'
+  };
+
+  const results = {};
+  for (const [key, symbol] of Object.entries(tickers)) {
+    results[key] = await fetchTicker(symbol);
+  }
+
+  // Calculate Gold per 10g in INR
+  if (results.gold && results.usdinr) {
+    const goldOzUsd = results.gold.price;
+    const goldOzUsdPrev = results.gold.prevClose;
+    const usdInr = results.usdinr.price;
+    const usdInrPrev = results.usdinr.prevClose;
+
+    const goldInr10g = (goldOzUsd * usdInr / 31.1034768) * 10;
+    const goldInr10gPrev = (goldOzUsdPrev * usdInrPrev / 31.1034768) * 10;
+
+    results.goldInr = {
+      price: Math.round(goldInr10g),
+      prevClose: Math.round(goldInr10gPrev)
+    };
+  }
+
+  res.json(results);
+});
+
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Backend running on http://localhost:${PORT}`);
