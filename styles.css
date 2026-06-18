@@ -104,6 +104,12 @@ header {
   .main-layout {
     grid-template-columns: 1fr;
   }
+  aside {
+    order: -1;
+  }
+  .main-content {
+    order: 1;
+  }
 }
 
 /* Sections */
@@ -388,5 +394,11 @@ header {
   .container {
     padding: 0 12px;
   }
+}
+
+/* Direct wrap enforcement */
+p, span, h1, h2, h3, a, .article-page-content, .article-summary, .article-title {
+  white-space: normal !important;
+  overflow-wrap: break-word !important;
 }
 
