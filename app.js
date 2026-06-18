@@ -65,6 +65,7 @@ async function init() {
   updateDateAndDate();
   renderBookOfTheWeek();
   await fetchLiveNews();
+  await updateMarketPulse();
 
   document.getElementById('refresh-btn').addEventListener('click', async (e) => {
     const btn = e.target;
@@ -72,11 +73,46 @@ async function init() {
     btn.innerText = "Refreshing...";
     
     await fetchLiveNews();
+    await updateMarketPulse();
     updateDateAndDate(true);
     
     btn.classList.remove('spinning');
     btn.innerText = "Refresh Now";
   });
+}
+
+async function updateMarketPulse() {
+  try {
+    const response = await fetch('/api/market-pulse');
+    const data = await response.json();
+
+    const formatChange = (item, prefix = "") => {
+      if (!item || item.price === undefined || item.prevClose === undefined) return "";
+      const price = item.price;
+      const prevClose = item.prevClose;
+      const diff = price - prevClose;
+      const pct = (diff / prevClose) * 100;
+      const arrow = diff >= 0 ? "▲" : "▼";
+      const color = diff >= 0 ? "green" : "red";
+      const formattedPrice = prefix + price.toLocaleString('en-IN', { maximumFractionDigits: 2 });
+      return `${formattedPrice} <span style="color:${color}">${arrow} ${Math.abs(pct).toFixed(2)}%</span>`;
+    };
+
+    if (data.nifty && document.getElementById('pulse-nifty')) {
+      document.getElementById('pulse-nifty').innerHTML = formatChange(data.nifty);
+    }
+    if (data.sensex && document.getElementById('pulse-sensex')) {
+      document.getElementById('pulse-sensex').innerHTML = formatChange(data.sensex);
+    }
+    if (data.goldInr && document.getElementById('pulse-gold')) {
+      document.getElementById('pulse-gold').innerHTML = formatChange(data.goldInr, "₹");
+    }
+    if (data.usdinr && document.getElementById('pulse-usdinr')) {
+      document.getElementById('pulse-usdinr').innerHTML = formatChange(data.usdinr);
+    }
+  } catch (error) {
+    console.error("Error updating market pulse:", error);
+  }
 }
 
 function updateDateAndDate(isRefresh = false) {
