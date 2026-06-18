@@ -29,7 +29,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   let formattedContent = paragraphs.map(p => {
     // Bold the first sentence to highlight important parts
     let sentences = p.split('. ');
-    let pTag = '<p style="margin-bottom: 1.5em; line-height: 1.8; font-size: 1.1em; color: #1a1a1a;">';
+    let pTag = '<p style="margin-bottom: 1.5em; line-height: 1.8; color: #1a1a1a;">';
     if (sentences.length > 1) {
       sentences[0] = `<strong>${sentences[0]}.</strong>`;
       return `${pTag}${sentences.join(' ')}</p>`;

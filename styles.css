@@ -322,7 +322,7 @@ header {
 }
 
 .article-page-content {
-  font-size: 1.15rem;
+  font-size: 0.95rem;
   color: var(--text-main); /* Set to black as requested */
   margin-bottom: 30px;
   line-height: 1.8;
