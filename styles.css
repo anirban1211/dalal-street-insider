@@ -12,10 +12,15 @@
   --transition: all 0.3s ease;
 }
 
-* {
+*, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -29,6 +34,7 @@ body {
   max-width: 1280px;
   margin: 0 auto;
   padding: 0 20px;
+  width: 100%;
 }
 
 /* Header */
