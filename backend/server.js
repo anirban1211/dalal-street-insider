@@ -356,7 +356,8 @@ app.get('/api/market-pulse', async (req, res) => {
     nifty: '%5ENSEI',
     sensex: '%5EBSESN',
     gold: 'GC=F',
-    usdinr: 'USDINR=X'
+    usdinr: 'USDINR=X',
+    crude: 'CL=F'
   };
 
   const results = {};

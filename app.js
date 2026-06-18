@@ -107,6 +107,9 @@ async function updateMarketPulse() {
     if (data.goldInr && document.getElementById('pulse-gold')) {
       document.getElementById('pulse-gold').innerHTML = formatChange(data.goldInr, "₹");
     }
+    if (data.crude && document.getElementById('pulse-crude')) {
+      document.getElementById('pulse-crude').innerHTML = formatChange(data.crude, "$");
+    }
     if (data.usdinr && document.getElementById('pulse-usdinr')) {
       document.getElementById('pulse-usdinr').innerHTML = formatChange(data.usdinr);
     }
