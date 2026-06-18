@@ -16,6 +16,8 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 html, body {
@@ -346,22 +348,14 @@ header {
   }
 
   .tabs-nav {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 8px;
     margin-bottom: 20px;
-    scrollbar-width: none; /* Hide scrollbar Firefox */
-  }
-
-  .tabs-nav::-webkit-scrollbar {
-    display: none; /* Hide scrollbar Chrome/Safari/Edge */
   }
 
   .tab-btn {
-    flex-shrink: 0;
-    padding: 6px 14px;
-    font-size: 0.85rem;
+    padding: 6px 12px;
+    font-size: 0.8rem;
   }
 
   .news-grid {
