@@ -37,8 +37,11 @@ window.addEventListener('DOMContentLoaded', async () => {
     return `${pTag}${p}</p>`;
   }).join('');
 
+  const sourceBadge = article.source ? `<div style="margin-bottom: 20px;"><span class="source-badge" style="font-size: 0.85rem; padding: 4px 10px;">Source: ${article.source}</span></div>` : '';
+
   document.getElementById('article-detail').innerHTML = `
     <h2 class="article-page-title">${article.title}</h2>
+    ${sourceBadge}
     <div class="article-page-content">${formattedContent}</div>
     <a href="${sourceUrl}" target="_blank" class="btn-source">Read Full Original Article</a>
   `;
@@ -56,13 +59,17 @@ window.addEventListener('DOMContentLoaded', async () => {
       const linkHref = rel.isPaywalled ? rel.url : `article.html?cat=${encodeURIComponent(cat)}&id=${realIndex}`;
       const targetBlank = rel.isPaywalled ? 'target="_blank"' : '';
       const buttonText = rel.isPaywalled ? 'Read on Source &nearr;' : 'Read More &rarr;';
+      const relSourceBadge = rel.source ? `<span class="source-badge">${rel.source}</span>` : '';
 
       const card = document.createElement('article');
       card.className = 'article-card';
       card.innerHTML = `
         <h3 class="article-title">${rel.title}</h3>
         <p class="article-summary">${rel.summary.length > 150 ? rel.summary.substring(0, 150) + '...' : rel.summary}</p>
-        <a href="${linkHref}" ${targetBlank} class="read-more">${buttonText}</a>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top: 10px;">
+          <a href="${linkHref}" ${targetBlank} class="read-more">${buttonText}</a>
+          ${relSourceBadge}
+        </div>
       `;
       relatedContainer.appendChild(card);
     });

@@ -26,18 +26,54 @@ const parser = new RSSParser({
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY); 
 
 const RSS_FEEDS = {
-  "Tech Industry": "https://economictimes.indiatimes.com/tech/rssfeeds/13357270.cms",
-  "Energy Industry": "https://www.livemint.com/rss/industry",
-  "Gold & Jewellery": "https://www.livemint.com/rss/companies",
-  "Nifty & Market Outlook": "https://economictimes.indiatimes.com/markets/rssfeeds/2146842.cms",
-  "Metals Outlook": "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
-  "Startup VC News": "https://www.livemint.com/rss/technology",
-  "Legal & Regulatory": "https://economictimes.indiatimes.com/news/economy/rssfeeds/1373380680.cms",
-  "Major Updates": "https://economictimes.indiatimes.com/rssfeedsdefault.cms",
-  "Serious Politics": "https://www.livemint.com/rss/politics",
-  "RBI, IMF, WB News": "https://www.livemint.com/rss/economy",
-  "Bond Markets": "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
-  "Other Industries": "https://economictimes.indiatimes.com/industry/rssfeeds/13352306.cms"
+  "Tech Industry": [
+    "https://economictimes.indiatimes.com/tech/rssfeeds/13357270.cms",
+    "https://www.livemint.com/rss/technology"
+  ],
+  "Energy Industry": [
+    "https://www.livemint.com/rss/industry",
+    "https://economictimes.indiatimes.com/industry/rssfeeds/13352306.cms"
+  ],
+  "Gold & Jewellery": [
+    "https://www.livemint.com/rss/companies",
+    "https://economictimes.indiatimes.com/markets/commodities/rssfeeds/1806263.cms"
+  ],
+  "Nifty & Market Outlook": [
+    "https://economictimes.indiatimes.com/markets/rssfeeds/2146842.cms",
+    "https://www.livemint.com/rss/markets"
+  ],
+  "Metals Outlook": [
+    "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
+    "https://economictimes.indiatimes.com/markets/commodities/rssfeeds/1806263.cms"
+  ],
+  "Startup VC News": [
+    "https://www.livemint.com/rss/technology",
+    "https://economictimes.indiatimes.com/small-biz/startups/rssfeeds/11836655.cms"
+  ],
+  "Legal & Regulatory": [
+    "https://economictimes.indiatimes.com/news/economy/rssfeeds/1373380680.cms",
+    "https://www.livemint.com/rss/economy"
+  ],
+  "Major Updates": [
+    "https://economictimes.indiatimes.com/rssfeedsdefault.cms",
+    "https://www.livemint.com/rss/news"
+  ],
+  "Serious Politics": [
+    "https://www.livemint.com/rss/politics",
+    "https://economictimes.indiatimes.com/news/politics/nation/rssfeeds/1052732.cms"
+  ],
+  "RBI, IMF, WB News": [
+    "https://www.livemint.com/rss/economy",
+    "https://economictimes.indiatimes.com/news/economy/rssfeeds/1373380680.cms"
+  ],
+  "Bond Markets": [
+    "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
+    "https://economictimes.indiatimes.com/markets/rssfeeds/2146842.cms"
+  ],
+  "Other Industries": [
+    "https://economictimes.indiatimes.com/industry/rssfeeds/13352306.cms",
+    "https://www.livemint.com/rss/industry"
+  ]
 };
 
 async function scrapeArticleText(url) {
@@ -178,11 +214,38 @@ async function updateNewsCache() {
   console.log("Fetching and rewriting new articles...");
   let newCache = {};
 
-  for (const [category, feedUrl] of Object.entries(RSS_FEEDS)) {
+  for (const [category, feedUrls] of Object.entries(RSS_FEEDS)) {
     try {
-      let feed = await parser.parseURL(feedUrl);
-      let top5Articles = feed.items.slice(0, 5);
-      
+      let combinedArticles = [];
+      for (const url of feedUrls) {
+        try {
+          let feed = await parser.parseURL(url);
+          const sourceName = url.includes('livemint.com') ? 'Mint' : url.includes('economictimes') ? 'ET' : 'Dow Jones';
+          feed.items.forEach(item => {
+            item.source = sourceName;
+          });
+          combinedArticles.push(...feed.items);
+        } catch (err) {
+          console.error(`Failed fetching feed ${url} for ${category}:`, err.message);
+        }
+      }
+
+      // Sort by publication date (newest first)
+      combinedArticles.sort((a, b) => new Date(b.isoDate || b.pubDate) - new Date(a.isoDate || a.pubDate));
+
+      // Deduplicate articles by title and URL
+      const seen = new Set();
+      const uniqueArticles = [];
+      for (const article of combinedArticles) {
+        const titleKey = (article.title || "").toLowerCase().trim();
+        if (!seen.has(article.link) && !seen.has(titleKey) && titleKey.length > 5) {
+          seen.add(article.link);
+          seen.add(titleKey);
+          uniqueArticles.push(article);
+        }
+      }
+
+      let top5Articles = uniqueArticles.slice(0, 5);
       newCache[category] = [];
       
       for (let article of top5Articles) {
@@ -199,7 +262,8 @@ async function updateNewsCache() {
           summary: rewritten.newSummary || article.contentSnippet,
           longArticle: rewritten.longArticle || rewritten.newSummary || article.contentSnippet,
           url: article.link,
-          isPaywalled: isPaywalled
+          isPaywalled: isPaywalled,
+          source: article.source
         });
       }
     } catch (err) {

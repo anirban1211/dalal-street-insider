@@ -172,11 +172,15 @@ function renderNews() {
       const linkHref = article.isPaywalled ? article.url : `article.html?cat=${encodeURIComponent(category)}&id=${articles.indexOf(article)}`;
       const targetBlank = article.isPaywalled ? 'target="_blank"' : '';
       const buttonText = article.isPaywalled ? 'Read on Source &nearr;' : 'Read More &rarr;';
+      const sourceBadge = article.source ? `<span class="source-badge">${article.source}</span>` : '';
 
       card.innerHTML = `
         <h3 class="article-title">${article.title}</h3>
         <p class="article-summary">${article.summary.length > 150 ? article.summary.substring(0, 150) + '...' : article.summary}</p>
-        <a href="${linkHref}" ${targetBlank} class="read-more">${buttonText}</a>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top: 10px;">
+          <a href="${linkHref}" ${targetBlank} class="read-more">${buttonText}</a>
+          ${sourceBadge}
+        </div>
       `;
       grid.appendChild(card);
     });
