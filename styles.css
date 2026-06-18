@@ -348,14 +348,22 @@ header {
   }
 
   .tabs-nav {
-    flex-wrap: wrap;
-    gap: 8px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
     margin-bottom: 20px;
+    scrollbar-width: none; /* Hide scrollbar Firefox */
+  }
+
+  .tabs-nav::-webkit-scrollbar {
+    display: none; /* Hide scrollbar Chrome/Safari/Edge */
   }
 
   .tab-btn {
-    padding: 6px 12px;
-    font-size: 0.8rem;
+    flex-shrink: 0;
+    padding: 6px 14px;
+    font-size: 0.85rem;
   }
 
   .news-grid {
