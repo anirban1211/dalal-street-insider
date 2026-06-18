@@ -28,51 +28,88 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const RSS_FEEDS = {
   "Tech Industry": [
     "https://economictimes.indiatimes.com/tech/rssfeeds/13357270.cms",
-    "https://www.livemint.com/rss/technology"
+    "https://www.livemint.com/rss/technology",
+    "https://feeds.a.dj.com/rss/RSSWSJD.xml",
+    "https://www.moneycontrol.com/rss/technology.xml",
+    "https://feeds.arstechnica.com/arstechnica/index",
+    "https://techcrunch.com/feed/",
+    "https://feeds.businessinsider.com/custom/all"
   ],
   "Energy Industry": [
     "https://www.livemint.com/rss/industry",
-    "https://economictimes.indiatimes.com/industry/rssfeeds/13352306.cms"
+    "https://economictimes.indiatimes.com/industry/rssfeeds/13352306.cms",
+    "https://feeds.a.dj.com/rss/WSJcomUSBusiness.xml",
+    "https://www.moneycontrol.com/rss/business.xml",
+    "https://feeds.businessinsider.com/custom/all"
   ],
   "Gold & Jewellery": [
     "https://www.livemint.com/rss/companies",
-    "https://economictimes.indiatimes.com/markets/commodities/rssfeeds/1806263.cms"
+    "https://economictimes.indiatimes.com/markets/commodities/rssfeeds/1806263.cms",
+    "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
+    "https://www.moneycontrol.com/rss/commodities.xml"
   ],
   "Nifty & Market Outlook": [
     "https://economictimes.indiatimes.com/markets/rssfeeds/2146842.cms",
-    "https://www.livemint.com/rss/markets"
+    "https://www.livemint.com/rss/markets",
+    "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
+    "https://www.moneycontrol.com/rss/marketreports.xml",
+    "https://feeds.businessinsider.com/custom/all"
   ],
   "Metals Outlook": [
     "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
-    "https://economictimes.indiatimes.com/markets/commodities/rssfeeds/1806263.cms"
+    "https://economictimes.indiatimes.com/markets/commodities/rssfeeds/1806263.cms",
+    "https://www.livemint.com/rss/markets",
+    "https://www.moneycontrol.com/rss/commodities.xml"
   ],
   "Startup VC News": [
     "https://www.livemint.com/rss/technology",
-    "https://economictimes.indiatimes.com/small-biz/startups/rssfeeds/11836655.cms"
+    "https://economictimes.indiatimes.com/small-biz/startups/rssfeeds/11836655.cms",
+    "https://feeds.a.dj.com/rss/RSSWSJD.xml",
+    "https://techcrunch.com/category/startups/feed/",
+    "https://www.moneycontrol.com/rss/business.xml",
+    "https://feeds.businessinsider.com/custom/all"
   ],
   "Legal & Regulatory": [
     "https://economictimes.indiatimes.com/news/economy/rssfeeds/1373380680.cms",
-    "https://www.livemint.com/rss/economy"
+    "https://www.livemint.com/rss/economy",
+    "https://feeds.a.dj.com/rss/WSJcomUSBusiness.xml",
+    "https://www.moneycontrol.com/rss/economy.xml",
+    "https://feeds.businessinsider.com/custom/all"
   ],
   "Major Updates": [
     "https://economictimes.indiatimes.com/rssfeedsdefault.cms",
-    "https://www.livemint.com/rss/news"
+    "https://www.livemint.com/rss/news",
+    "https://feeds.a.dj.com/rss/RSSWorldNews.xml",
+    "https://www.moneycontrol.com/rss/latestnews.xml",
+    "https://feeds.arstechnica.com/arstechnica/index",
+    "https://techcrunch.com/feed/",
+    "https://feeds.businessinsider.com/custom/all"
   ],
   "Serious Politics": [
     "https://www.livemint.com/rss/politics",
-    "https://economictimes.indiatimes.com/news/politics/nation/rssfeeds/1052732.cms"
+    "https://economictimes.indiatimes.com/news/politics/nation/rssfeeds/1052732.cms",
+    "https://feeds.a.dj.com/rss/RSSOpinion.xml",
+    "https://www.moneycontrol.com/rss/politics.xml"
   ],
   "RBI, IMF, WB News": [
     "https://www.livemint.com/rss/economy",
-    "https://economictimes.indiatimes.com/news/economy/rssfeeds/1373380680.cms"
+    "https://economictimes.indiatimes.com/news/economy/rssfeeds/1373380680.cms",
+    "https://feeds.a.dj.com/rss/RSSWorldNews.xml",
+    "https://www.moneycontrol.com/rss/economy.xml",
+    "https://feeds.businessinsider.com/custom/all"
   ],
   "Bond Markets": [
     "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
-    "https://economictimes.indiatimes.com/markets/rssfeeds/2146842.cms"
+    "https://economictimes.indiatimes.com/markets/rssfeeds/2146842.cms",
+    "https://www.livemint.com/rss/markets",
+    "https://www.moneycontrol.com/rss/marketreports.xml"
   ],
   "Other Industries": [
     "https://economictimes.indiatimes.com/industry/rssfeeds/13352306.cms",
-    "https://www.livemint.com/rss/industry"
+    "https://www.livemint.com/rss/industry",
+    "https://feeds.a.dj.com/rss/WSJcomUSBusiness.xml",
+    "https://www.moneycontrol.com/rss/business.xml",
+    "https://feeds.businessinsider.com/custom/all"
   ]
 };
 
@@ -220,7 +257,13 @@ async function updateNewsCache() {
       for (const url of feedUrls) {
         try {
           let feed = await parser.parseURL(url);
-          const sourceName = url.includes('livemint.com') ? 'Mint' : url.includes('economictimes') ? 'ET' : 'Dow Jones';
+          const sourceName = url.includes('livemint.com') ? 'Mint' : 
+                             url.includes('economictimes') ? 'ET' : 
+                             url.includes('moneycontrol.com') ? 'Moneycontrol' : 
+                             url.includes('arstechnica.com') ? 'Ars Technica' : 
+                             url.includes('techcrunch.com') ? 'TechCrunch' : 
+                             url.includes('businessinsider.com') ? 'Business Insider' : 
+                             'Dow Jones';
           feed.items.forEach(item => {
             item.source = sourceName;
           });
@@ -276,7 +319,7 @@ async function updateNewsCache() {
   console.log("News updated successfully!");
 }
 
-cron.schedule('0 */12 * * *', () => {
+cron.schedule('0 */3 * * *', () => {
   updateNewsCache();
 });
 
